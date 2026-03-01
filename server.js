@@ -1,8 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const http = require("http");              // <-- new
-const { Server } = require("socket.io");   // <-- new
+const http = require("http");              
+const { Server } = require("socket.io");   
 
 const connectDB = require("./src/config/db");
 const authRoutes = require("./src/routes/authRoutes");
@@ -13,17 +13,14 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const server = http.createServer(app);     // <-- wrap express app
+const server = http.createServer(app);   
 
-// Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: "*",  // Allow all for dev (change to frontend URL later)
+    origin: "*",  
     methods: ["GET", "POST"]
   }
 });
-
-// Make io available in every request (so controllers can use it)
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -51,8 +48,6 @@ app.use((err, req, res, next) => {
 // Socket connection handling
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
-
-  // User joins their own room based on userId (sent from frontend after login)
   socket.on("join", (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined room`);
